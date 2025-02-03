@@ -36,6 +36,8 @@ jobs:
           --template-body file://$TEMPLATE_FILE \
           --capabilities CAPABILITY_IAM \
           --region ${{ secrets.AWS_DEFAULT_REGION }}
+          
+        aws s3 cp ./api_to_s3/fetch_from_api_to_s3.py s3://mys3bucket068/scripts/fetch_from_api_to_s3.py
 
     # Optional: Verify deployment
     - name: Verify deployment
