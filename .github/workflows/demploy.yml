@@ -25,7 +25,7 @@ jobs:
     # Step 3: Install dependencies (if needed)
     - name: Install dependencies
       run: |
-        sudo apt-get install -y awscli
+        pip install awscli
 
     # Step 4: Deploy CloudFormation stack (Create or Update)
     - name: Deploy CloudFormation stack
