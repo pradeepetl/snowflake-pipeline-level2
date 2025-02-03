@@ -29,8 +29,8 @@ jobs:
 
     # Step 4: Deploy CloudFormation stack (Create or Update)
     - name: Deploy CloudFormation stack
-      TEMPLATE_FILE ="./template.yml"
       run: |
+        TEMPLATE_FILE = "./template.yml"
         aws cloudformation create-stack \
           --template-body file://$TEMPLATE_FILE \
           --stack-name github_action_aws_stack \
