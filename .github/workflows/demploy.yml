@@ -32,7 +32,7 @@ jobs:
       run: |
         TEMPLATE_FILE="./template.yml"
         aws cloudformation create-stack \
-          --stack-name github_action_aws_stack \
+          --stack-name github-action-aws-stack \
           --template-body file://$TEMPLATE_FILE \
           --capabilities CAPABILITY_IAM \
           --region ${{ secrets.AWS_DEFAULT_REGION }}
