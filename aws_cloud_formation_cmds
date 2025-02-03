@@ -1,0 +1,8 @@
+aws cloudformation create-stack --stack-name snowpark-test --template-body file:///workspaces/snowflake-pipeline-level2/template.yml \
+--capabilities CAPABILITY_IAM
+
+aws cloudformation describe-stacks --stack-name snowpark-test
+
+aws cloudformation delete-stack --stack-name my-stack
+
+aws s3 cp ./api_to_s3/fetch_from_api_to_s3.py s3://mys3bucket068/scripts/fetch_from_api_to_s3.py

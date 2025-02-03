@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  
+  # IAM Role for Glue Job with permission to write to S3
+  GlueJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: GlueJobPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                  - s3:GetObject
+                Resource: arn:aws:s3:::mys3bucket068/*
+
+  # AWS Glue Job
+  GlueJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: my_first_glue_job
+      Role: !GetAtt GlueJobRole.Arn
+      Command:
+        Name: glueetl
+        ScriptLocation: s3://mys3bucket068/scripts/fetch_from_api_to_s3.py
+      DefaultArguments:
+        --TempDir: s3://mys3bucket068/tempdir/
+        --job-language: python
+        --additional-python-modules: boto3,pandas
+      #MaxCapacity: 2  # Adjust based on your needs (this is a placeholder)
+      Timeout: 60  # Timeout in minutes
+      MaxRetries: 3
+      GlueVersion: '3.0'  # Specify the Glue version
+      WorkerType: G.1X  # Can be DPU, G.1X, etc.
+      NumberOfWorkers: 2  # Adjust based on your job size
+
+Outputs:
+  GlueJobRoleArn:
+    Description: "The ARN of the Glue Job Role"
+    Value: !GetAtt GlueJobRole.Arn
+  GlueJobName:
+    Description: "The name of the Glue Job"
+    Value: !Ref GlueJob
