@@ -54,7 +54,7 @@ jobs:
     # Optional: Verify deployment
     - name: Verify deployment
       run: |
-        aws cloudformation describe-stacks --stack-name glue-job-stack
+        aws cloudformation describe-stacks --stack-name github-action-aws-stack
     
           
     - name: Setup Python 3.9
