@@ -40,16 +40,37 @@ jobs:
         pip install awscli
 
     # Step 4: Deploy CloudFormation stack (Create or Update)
-    - name: Deploy CloudFormation stack
-      run: |
-        TEMPLATE_FILE="./template.yml"
-        aws cloudformation create-stack \
-          --stack-name github-action-aws-stack \
-          --template-body file://$TEMPLATE_FILE \
-          --capabilities CAPABILITY_IAM \
-          --region ${{ secrets.AWS_DEFAULT_REGION }}
+    # - name: Deploy CloudFormation stack
+    #   run: |
+    #     TEMPLATE_FILE="./template.yml"
+    #     aws cloudformation create-stack \
+    #       --stack-name github-action-aws-stack \
+    #       --template-body file://$TEMPLATE_FILE \
+    #       --capabilities CAPABILITY_IAM \
+    #       --region ${{ secrets.AWS_DEFAULT_REGION }}
           
-        aws s3 cp ./api_to_s3/fetch_from_api_to_s3.py s3://mys3bucket068/scripts/fetch_from_api_to_s3.py
+    #     aws s3 cp ./api_to_s3/fetch_from_api_to_s3.py s3://mys3bucket068/scripts/fetch_from_api_to_s3.py
+
+    - name: Setup AWS SAM
+      uses: aws-actions/setup-sam@v2
+
+    - name: Run AWS SAM Build
+      run: sam build --use-container --template-file template.yml
+
+    - name: sam package
+      #run: sam package --template-file .aws-sam/build/template.yaml --s3-bucket ${{env.S3_BUCKET}} --output-template-file template.yml --kms-key-id alias/aws/s3
+      run: sam package --template-file .aws-sam/build/template.yaml --s3-bucket mys3bucket068 --output-template-file template.yml --kms-key-id alias/aws/s3
+    
+    - name: Deploy to AWS Cloudformation
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        #name: pipeline-${{github.event.repository.name}}-deployment
+        name: github-action-aws-stack
+        template: ./template.yml
+        #parameter-overrides : file://${{ github.workspace }}/params.${{ env.DEPLOYMENT_EVN }}.json
+        changeset: --change-set-name
+        capabilities: CAPABILITY_IAM, CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
+        no-fail-on-empty-changeset: "1"
 
     # Optional: Verify deployment
     - name: Verify deployment
