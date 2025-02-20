@@ -71,10 +71,6 @@ jobs:
       with:
         cli-version: "latest"
         default-config-file-path: "config.toml"
-
-    - name: copy sql file
-      working-directory: DE_PROJECT_1/app
-      run: snow stage copy load_to_emp_tgt.sql @dev_deployment/de_project_1/
       
     - name: Deploy Snowpark apps
       working-directory: DE_PROJECT_1
@@ -98,3 +94,7 @@ jobs:
         SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA_DEV }}
       working-directory: DE_PROJECT_1/app
       run: python create_task.py
+
+    - name: copy sql file
+      working-directory: DE_PROJECT_1/app
+      run: snow stage copy load_to_emp_tgt.sql @dev_deployment/de_project_1/
