@@ -37,11 +37,11 @@ Resources:
       DefaultArguments:
         --TempDir: s3://mys3bucket068/tempdir/
         --job-language: python
-        --additional-python-modules: boto3,pandas
+        --additional-python-modules: boto3,pandas,snowflake-snowpark-python
       #MaxCapacity: 2  # Adjust based on your needs (this is a placeholder)
       Timeout: 60  # Timeout in minutes
       MaxRetries: 3
-      GlueVersion: '3.0'  # Specify the Glue version
+      GlueVersion: '4.0'  # Specify the Glue version
       WorkerType: G.1X  # Can be DPU, G.1X, etc.
       NumberOfWorkers: 2  # Adjust based on your job size
 
