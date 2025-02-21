@@ -2,6 +2,7 @@ import requests
 import boto3
 import json
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from snowflake.snowpark import Session
 
 # URL for the Ditto Pokemon data
 url = 'https://pokeapi.co/api/v2/pokemon/ditto'
@@ -41,3 +42,19 @@ if response.status_code == 200:
 
 else:
     print(f"Failed to retrieve data from the API. Status code: {response.status_code}")
+
+
+# Make connection and create Snowpark session
+connection_parameters = {"account":"eyyzdoj-sg96461", \
+"user":"pradeep",\
+"password": "Abcd067$",\
+"role":"ACCOUNTADMIN", \
+"warehouse":"COMPUTE_WH", \
+"database":"DEMO_DB", \
+"schema":"PUBLIC" \
+}
+
+session = Session.builder.configs(connection_parameters).create()
+print("************ EXECUTING TASK *********************")
+session.sql("EXECUTE TASK DEMO_DB.PUBLIC.DAG_COPY_EMP;").collect()
+print("****** EXECUTED********")
