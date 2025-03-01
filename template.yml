@@ -1,5 +1,28 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
+
+  MyLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws-snow-glue/jobs/output"  # Replace with your log group name
+      RetentionInDays: 7  # Optional: Set log retention period
+
+  # Create the AWS Secrets Manager Secret
+  MyDatabaseSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: mysnowdbcreds
+      Description: "Stores database credentials securely."
+      SecretString: !Sub |
+        { 
+        "account":"eaxwtbr-au66278",
+          "user":"pradeep",
+          "password": "**********",
+          "role":"ACCOUNTADMIN", 
+          "warehouse":"COMPUTE_WH", 
+          "database":"DEMO_DB", 
+          "schema":"PUBLIC" 
+        }
   
   # IAM Role for Glue Job with permission to write to S3
   GlueJobRole:
@@ -24,6 +47,30 @@ Resources:
                   - s3:PutObjectAcl
                   - s3:GetObject
                 Resource: arn:aws:s3:::mys3bucket068/*
+
+        - PolicyName: GlueJobSecretPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "secretsmanager:List*"
+                  - "secretsmanager:Get*"
+                  - "secretsmanager:Describe*"
+                Resource: !Ref MyDatabaseSecret
+
+        - PolicyName: GlueJobLogPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: 
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws-snow-glue/jobs/output:*"
+        
 
   # AWS Glue Job
   GlueJob:
@@ -52,3 +99,9 @@ Outputs:
   GlueJobName:
     Description: "The name of the Glue Job"
     Value: !Ref GlueJob
+  SecretARN:
+    Description: "The ARN of the created secret."
+    Value: !Ref MyDatabaseSecret
+  LogGroupName:
+    Description: "The created CloudWatch Log Group"
+    Value: !Ref MyLogGroup
